@@ -3,7 +3,7 @@
 
 ## Установка
 ```
-git clone https://github.com/powehihihi/playlist
+git clone https://github.com/powehihihi/playlist && cd playlist
 ```
 ### Docker
 Приложение:
