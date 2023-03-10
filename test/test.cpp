@@ -1,5 +1,4 @@
 //#ifdef TEST
-#include <bits/chrono.h>
 #include <catch2/catch_test_macros.hpp>
 #include <chrono>
 #include <functional>
@@ -30,6 +29,12 @@ std::list<Song> list2 { Song{"short1", 3},
 
 std::list<Song> emptylist;
 
+std::list<Song> list3 { Song("песня1", 2), 
+                        Song("песня2", 3),
+                        Song("песня3", 4),
+                        Song("песня4", 2),
+                        Song("песня5", 3)
+                        };
 
 auto Stopwatch(std::function<void(void)> f) {
   using namespace std::chrono;
@@ -57,7 +62,10 @@ void test18() {
   DEFAULT_START(emptylist, 1);
   DEFAULT_END();
 }
-
+void test19() {
+  DEFAULT_START(list3, 1);
+  DEFAULT_END();
+}
 TEST_CASE("Duration") {
   
   REQUIRE( Stopwatch(test18) ==0);
@@ -94,6 +102,16 @@ auto test12() {
   playlist.Play();
   DEFAULT_END();
   return res12.first.Name;
+}
+
+void test20() {
+  DEFAULT_START(list3, 1);
+  playlist.Pause();
+  playlist.Pause();
+  playlist.Pause();
+  playlist.Pause();
+  std::this_thread::sleep_for(std::chrono::seconds(2));
+  DEFAULT_END();
 }
 
 TEST_CASE("Pause") {

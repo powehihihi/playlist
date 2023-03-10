@@ -1,5 +1,4 @@
 #include "playlist.hpp"
-#include <bits/chrono.h>
 #include <chrono>
 #include <stdexcept>
 #include <thread>
