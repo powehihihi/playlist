@@ -6,7 +6,7 @@ UI::UI() {
   noecho();
   cbreak();			/* Line buffering disabled, Pass on evertything to me 		*/
   curs_set(0);
-  //mvprintw(LINES-1, 0, "Hotkeys: \t<space>-Pause/Resume\t");
+  keypad(stdscr, TRUE);
   refresh();
 
   h=4;

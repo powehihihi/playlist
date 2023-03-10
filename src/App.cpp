@@ -2,6 +2,7 @@
 #include "playlist.hpp"
 #include <curses.h>
 #include <mutex>
+#include <stdexcept>
 #include <thread>
 
 App::App(std::list<Song>&& List, int loops): 
@@ -14,6 +15,7 @@ void App::Run() {
   std::thread keysThread(&App::HandleKeys, this);
   auto& Mutex = state->getMutex();
   auto& notifier = state->getNotifier();
+  UI::ShowKeys();
   while (!state->Ready()) {
     auto newstate = state->getState();
     ui.Update(newstate.first, newstate.second);
@@ -36,6 +38,12 @@ void App::HandleKeys() {
         break;
       case ' ':
         playlist.Pause();
+        break;
+      case 'N':
+        try {
+          auto song = UI::AddNewSongWindow();
+          playlist.AddSong(song);
+        } catch (std::runtime_error&) {}
         break;
       default:
         playlist.Play();
