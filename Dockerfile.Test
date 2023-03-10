@@ -12,16 +12,13 @@ RUN dnf update -y && dnf install -y \
 RUN git clone https://github.com/catchorg/Catch2.git && \
     cd Catch2 && \
     cmake -Bbuild -H. -DBUILD_TESTING=OFF && \
-    cmake --build build/ --target install
+    cmake --build build/ --target install && \
+    cd ..
 
 # build project
 ADD ./ /app/
-WORKDIR /app/build
-
+WORKDIR /app/test/build
 RUN cmake .. && make
 
-# final step for ncurses
-
-
-ENTRYPOINT ["./MusicPlayerUI"]
+ENTRYPOINT ["./tests"]
 
