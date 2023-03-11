@@ -1,44 +1,100 @@
-#include "UI.hpp"
+#ifndef UI_HPP
+#define UI_HPP
+
 #include <curses.h>
+#include <memory>
 #include <ncurses.h>
+#include <stdexcept>
+#include <string>
+#include <exception>
+#include "playlist.hpp"
 
-UI::UI() {
-  initscr();			/* Start curses mode 		*/
-  noecho();
-  cbreak();			/* Line buffering disabled, Pass on evertything to me 		*/
-  curs_set(0);
-  keypad(stdscr, TRUE);
-  refresh();
+class UI {
+ private:
+  int h, w, xwin, ywin;
+  WINDOW * frame, * Box;
+ public:
+  UI();
+  ~UI();
+  void Update(const Song s, int time);
 
-  h=4;
-  w=COLS/4;
-  xwin = (COLS-w)/2;
-  ywin = (LINES-h)/2;
 
-  Box = newwin(h, w, ywin, xwin);
-  frame = newwin(h-2, w-2, ywin+1, xwin+1);
-  wrefresh(Box);
-  box(Box, 0, 0);
-  mvwaddch(Box, h-1, 2, ACS_RTEE);
-  mvwaddch(Box, h-1, 8, ACS_LTEE);
-  mvwaddch(Box, h-1, w-3, ACS_LTEE);
-  mvwaddch(Box, h-1, w-9, ACS_RTEE);
-}
+  static void ShowKeys() {
+    std::string keys = "\t<N> New song\t\t<h> Prev song\t\t<Space> Pause\t\t<Anything> Play\t\t<l> Next song";
+    mvprintw(LINES-2, 0, "%s", keys.c_str());
+    refresh();
+  }
+  static Song AddNewSongWindow() {
+    WINDOW * addwin = newwin(4, COLS/4, 1,1);
+    WINDOW * inner = newwin(2, COLS/4-2, 1+1, 1+1);
+    box(addwin, 0, 0);
+    mvwprintw(addwin, 0, 1, "Song name: ");
+    wrefresh(addwin);
+    wrefresh(inner);
+    int key;
+    std::string name = "";
+    for ( ; ; ) {
+      key = getch();
+      if (key=='\n')
+        break;
+      /*
+      if (key==KEY_BREAK) {
+        name = "";
+        break;
+      }
+      */
+      if (key==KEY_BACKSPACE) {
+        if (!name.empty()) {
+          name.erase(name.length()-1, 1);
+          wclear(inner);
+          wprintw(inner, "%s", name.c_str());
+        }
+      }
+      else {
+        name.push_back(static_cast<char>(key));
+        wprintw(inner, "%c", name.back());
+      }
+      wrefresh(inner);
+    }
+    if (name.empty())
+      throw std::runtime_error("Song with an empty name");
+    std::string time;
+    box(addwin, 0, 0);
+    mvwprintw(addwin, 0, 1, "Song duration: ");
+    wclear(inner);
+    wrefresh(addwin);
+    wrefresh(inner);
+    for ( ; ; ) {
+      key = getch();
+      if (key=='\n')
+        break;
+      /*
+      if (key==KEY_OPEN) {
+        time="";
+        break;
+      }*/
+      if (key==KEY_BACKSPACE) {
+        if (!time.empty()) {
+          time.erase(time.length()-1, 1);
+          wclear(inner);
+          wprintw(inner, "%s", time.c_str());
+        }
+      }
+      else if (key>='0' && key<='9') {
+        time.push_back(static_cast<char>(key));
+        wprintw(inner, "%c", time.back());
+      }
+      wrefresh(inner);
+    }
+    wclear(inner);
+    wclear(addwin);
+    wborder(addwin, ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ');
+    wrefresh(inner);
+    wrefresh(addwin);
+    delwin(inner);
+    delwin(addwin);
+    return Song(name, std::stoi(time));
+  }
+};
 
-UI::~UI() {
-  endwin();
-}
-
-void UI::Update(const Song s, int time) {
-  std::string emptyName (w-2, ' '), emptyTime(5, ' ');
-  wclear(frame);
-  int x = (int)s.Name.size() > w-2 ? 1 : (w-s.Name.size())/2;
-  mvwprintw(frame, 0, x, "%s", s.Name.c_str());
-  mvwprintw(frame, h-1, w-8, "%s", emptyTime.c_str());
-  mvwprintw(Box, h-1, w-8, "%02d:%02d", s.Duration/60, s.Duration%60);
-  mvwprintw(Box, h-1, 3, "%s", emptyTime.c_str());
-  mvwprintw(Box, h-1, 3, "%02d:%02d", time/60, time%60);
-  wrefresh(Box);
-  wrefresh(frame);
-}
-
+#endif // !UI_HPP
