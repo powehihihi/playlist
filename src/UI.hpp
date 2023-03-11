@@ -11,11 +11,9 @@
 
 class UI {
  private:
-  //std::shared_ptr<SharedState> state;
   int h, w, xwin, ywin;
-  WINDOW * frame;
+  WINDOW * frame, * Box;
  public:
-  //UI(std::shared_ptr<SharedState> state);
   UI();
   ~UI();
   void Update(const Song s, int time);
