@@ -11,7 +11,7 @@ git clone https://github.com/powehihihi/playlist && cd playlist
 docker build -f Dockerfile.App -t 'app' .
 docker run -ti -e TERM app
 ```
-Тесты без приложения (сборка ~8 минут):
+Тесты без приложения (сборка ~8 минут, сами тесты ~4 минуты):
 ```
 docker build -f Dockerfile.Test  -t 'tests' .
 docker run tests
